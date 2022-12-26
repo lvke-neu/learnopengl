@@ -40,6 +40,9 @@ int main(void)
 		return -1;
 	}
 
+	std::cout << "GL Version" << glGetString(GL_VERSION) << std::endl;
+	std::cout << "GL Version" << glGetString(GL_VENDOR) << std::endl;
+	std::cout << "GL Version" << glGetString(GL_RENDERER) << std::endl;
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
