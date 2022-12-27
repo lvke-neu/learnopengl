@@ -44,6 +44,30 @@ int main(void)
 	std::cout << "GL Version" << glGetString(GL_VENDOR) << std::endl;
 	std::cout << "GL Version" << glGetString(GL_RENDERER) << std::endl;
 
+	//vertexbuff
+	float triPosition[] =
+	{
+		-0.5f, -0.5f, 0.0f,
+		 0.5f, -0.5,  0.0f,
+		 0.0f,  0.5f, 0.0f
+	};
+	unsigned int vertexbuffer;
+	glGenBuffers(1, &vertexbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(triPosition), triPosition, GL_STATIC_DRAW);
+
+	//layout
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, false ,3 * sizeof(float), (void*)0);
+	
+
+	//unbind
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	//shader
+
+
+
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
@@ -53,8 +77,9 @@ int main(void)
 		glClearColor(0.5f, 0.5f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		
+		//draw
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 		
-		//glGenBuffers()
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
