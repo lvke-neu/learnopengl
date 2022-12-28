@@ -165,7 +165,7 @@ int main(void)
  
 	//shader
 	ShaderSourceCode shaderSourceCode;
-	shaderSourceCode = ParseShaderFile("D:/C++Project/learnopengl/learnopengl/shader/Basic.shader");
+	shaderSourceCode = ParseShaderFile("shader/Basic.shader");
 	unsigned int program = CreateProgram(shaderSourceCode.VertexShaderSourceCode, shaderSourceCode.PixelShaderSourceCode);
 
 	glUseProgram(program);
