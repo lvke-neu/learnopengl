@@ -13,6 +13,64 @@ void OnResize(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
+unsigned int CompileShader(unsigned int shaderType, const char* shaderSourceCode)
+{
+	unsigned int shader;
+	shader = glCreateShader(shaderType);
+	glShaderSource(shader, 1, &shaderSourceCode, nullptr);
+	glCompileShader(shader);
+
+	int result;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
+	if (result == GL_FALSE)
+	{
+		int infoLength;
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLength);
+
+		char* errorInfo = new char[infoLength];
+		glGetShaderInfoLog(shader, infoLength, &infoLength, errorInfo);
+		std::cout << errorInfo << std::endl;
+		delete[] errorInfo;
+
+		glDeleteShader(shader);
+		return 0;
+	}
+
+	return shader;
+}
+
+unsigned int CreateProgram(const std::string& vsShaderCode, const std::string& psShaderCode)
+{
+	unsigned int program = glCreateProgram();
+	unsigned int vsShader = CompileShader(GL_VERTEX_SHADER, vsShaderCode.c_str());
+	unsigned int psShader = CompileShader(GL_FRAGMENT_SHADER, psShaderCode.c_str());
+
+	glAttachShader(program, vsShader);
+	glAttachShader(program, psShader);
+	glLinkProgram(program);
+	glValidateProgram(program);
+
+	int result;
+	glGetProgramiv(program, GL_LINK_STATUS, &result);
+	if (result == GL_FALSE)
+	{
+		int infoLength;
+		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLength);
+
+		char* errorInfo = new char[infoLength];
+		glGetProgramInfoLog(program, infoLength, &infoLength, errorInfo);
+		std::cout << errorInfo << std::endl;
+		delete[] errorInfo;
+
+		glDeleteProgram(program);
+		return 0;
+	}
+
+	glDeleteShader(vsShader);
+	glDeleteShader(psShader);
+
+	return program;
+}
 
 int main(void)
 {
@@ -61,12 +119,25 @@ int main(void)
 	glVertexAttribPointer(0, 3, GL_FLOAT, false ,3 * sizeof(float), (void*)0);
 	
 
-	//unbind
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+ 
 	//shader
+	std::string vsShaderCode =
+		"#version 330 core \n"
+		"layout(location = 0) in vec3 position;\n"
+		"void main() \n"
+		"{\n"
+		"gl_Position = vec4(position.xyz, 1.0);"
+		"}\n";
+	std::string psShaderCode =
+		"#version 330 core \n"
+		"out vec4 pixelColor;\n"
+		"void main() \n"
+		"{\n"
+		"pixelColor = vec4(1.0,0.0,0.0, 1.0);"
+		"}\n";
+	unsigned int program = CreateProgram(vsShaderCode, psShaderCode);
 
-
+	glUseProgram(program);
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
