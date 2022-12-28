@@ -1,6 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 void KeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -11,6 +13,47 @@ void KeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods
 void OnResize(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+}
+
+struct ShaderSourceCode
+{
+	std::string VertexShaderSourceCode;
+	std::string PixelShaderSourceCode;
+};
+
+ShaderSourceCode ParseShaderFile(const std::string& filePath)
+{
+	std::ifstream ifs(filePath);
+	
+	enum  class ShaderType
+	{
+		NONE = -1,
+		VERTEX = 0,
+		PIXEL = 1
+	};
+
+	std::string line;
+	std::stringstream ss[2];
+	ShaderType shaderType = ShaderType::NONE;
+	while (getline(ifs, line))
+	{
+		if (line.find("shader") != std::string::npos)
+		{
+			if (line.find("vertex") != std::string::npos)
+			{
+				shaderType = ShaderType::VERTEX;
+			}
+			else if (line.find("pixel") != std::string::npos)
+			{
+				shaderType = ShaderType::PIXEL;
+			}
+		}
+		else
+		{
+			ss[(int)shaderType] << line << "\n";
+		}
+	}
+	return { ss[0].str(), ss[1].str() };
 }
 
 unsigned int CompileShader(unsigned int shaderType, const char* shaderSourceCode)
@@ -121,21 +164,9 @@ int main(void)
 
  
 	//shader
-	std::string vsShaderCode =
-		"#version 330 core \n"
-		"layout(location = 0) in vec3 position;\n"
-		"void main() \n"
-		"{\n"
-		"gl_Position = vec4(position.xyz, 1.0);"
-		"}\n";
-	std::string psShaderCode =
-		"#version 330 core \n"
-		"out vec4 pixelColor;\n"
-		"void main() \n"
-		"{\n"
-		"pixelColor = vec4(1.0,0.0,0.0, 1.0);"
-		"}\n";
-	unsigned int program = CreateProgram(vsShaderCode, psShaderCode);
+	ShaderSourceCode shaderSourceCode;
+	shaderSourceCode = ParseShaderFile("D:/C++Project/learnopengl/learnopengl/shader/Basic.shader");
+	unsigned int program = CreateProgram(shaderSourceCode.VertexShaderSourceCode, shaderSourceCode.PixelShaderSourceCode);
 
 	glUseProgram(program);
 
@@ -158,6 +189,8 @@ int main(void)
 		/* Poll for and process events */
 		glfwPollEvents();
 	} 
+
+	glDeleteProgram(program);
 
 	glfwTerminate();
 	return 0;
