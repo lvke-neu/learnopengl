@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <assert.h>
 
 void KeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -13,6 +14,24 @@ void KeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods
 void OnResize(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+}
+
+#define CHECKCALL(x) ClearGlError();\
+	x;\
+	CheckGlError();
+
+void ClearGlError()
+{
+	while (glGetError() != GL_NO_ERROR);
+}
+
+void CheckGlError()
+{ 
+	assert(glGetError() == GL_NO_ERROR);
+	//while (GLenum type = glGetError())
+	//{
+	//	std::cout << type << std::endl;
+	//}
 }
 
 struct ShaderSourceCode
@@ -180,6 +199,7 @@ int main(void)
 	glUseProgram(program);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	 
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
@@ -192,8 +212,8 @@ int main(void)
 		
 		//draw
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
-		glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(float), GL_UNSIGNED_INT, 0);
-		
+
+		CHECKCALL(glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(float), GL_UNSIGNED_INT, 0));
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
