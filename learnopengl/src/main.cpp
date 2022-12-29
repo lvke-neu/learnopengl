@@ -27,7 +27,10 @@ void ClearGlError()
 
 void CheckGlError()
 {
-	assert(glGetError() == GL_NO_ERROR);
+	GLenum errorType = glGetError();
+	if(errorType != GL_NO_ERROR)
+		std::cout << "Error Type: " << errorType << std::endl;
+	assert(errorType == GL_NO_ERROR);
 }
 
 struct ShaderSourceCode
@@ -191,12 +194,19 @@ int main(void)
 	shaderSourceCode = ParseShaderFile("shader/Basic.shader");
 
 	unsigned int program = CreateProgram(shaderSourceCode.VertexShaderSourceCode, shaderSourceCode.PixelShaderSourceCode);
-
+	
 	glUseProgram(program);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	 
-
+	//constant buffer
+	int location = glGetUniformLocation(program, "u_color1");
+	CHECKCALL(glUniform4f(location, 1.0f, 0.0f, 0.0f, 1.0f));
+	location = glGetUniformLocation(program, "u_color2");
+	CHECKCALL(glUniform4f(location, 0.0f, 1.0f, 0.0f, 1.0f));
+	location = glGetUniformLocation(program, "u_color3");
+	CHECKCALL(glUniform4f(location, 0.0f, 0.0f, 1.0f, 1.0f));
+	
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
@@ -208,7 +218,6 @@ int main(void)
 		
 		//draw
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
-
 		CHECKCALL(glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(float), GL_UNSIGNED_INT, 0));
 
 		/* Swap front and back buffers */
