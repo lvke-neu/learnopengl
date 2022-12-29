@@ -26,12 +26,8 @@ void ClearGlError()
 }
 
 void CheckGlError()
-{ 
+{
 	assert(glGetError() == GL_NO_ERROR);
-	//while (GLenum type = glGetError())
-	//{
-	//	std::cout << type << std::endl;
-	//}
 }
 
 struct ShaderSourceCode
