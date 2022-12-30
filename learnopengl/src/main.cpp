@@ -141,6 +141,10 @@ int main(void)
 	if (!glfwInit())
 		return -1;
 
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 	/* Create a windowed mode window and its OpenGL context */
 	window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
 	if (!window)
@@ -163,6 +167,11 @@ int main(void)
 	std::cout << "GL Version" << glGetString(GL_VENDOR) << std::endl;
 	std::cout << "GL Version" << glGetString(GL_RENDERER) << std::endl;
 
+	//vertex array
+	unsigned int vertexarray;
+	glGenVertexArrays(1, &vertexarray);
+	glBindVertexArray(vertexarray);
+
 	//vertexbuff
 	float vertices[] =
 	{
@@ -181,6 +190,8 @@ int main(void)
 	glVertexAttribPointer(0, 3, GL_FLOAT, false ,3 * sizeof(float), (void*)0);
 	
 
+
+
 	//index buffer
 	unsigned int indices[] =
 	{ 0,1,2,2,3,0 };
@@ -188,24 +199,18 @@ int main(void)
 	glGenBuffers(1, &indexbuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
- 
+
 	//shader
 	ShaderSourceCode shaderSourceCode;
 	shaderSourceCode = ParseShaderFile("shader/Basic.shader");
 
 	unsigned int program = CreateProgram(shaderSourceCode.VertexShaderSourceCode, shaderSourceCode.PixelShaderSourceCode);
-	
-	glUseProgram(program);
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	 
-	//constant buffer
-	int location = glGetUniformLocation(program, "u_color1");
-	CHECKCALL(glUniform4f(location, 1.0f, 0.0f, 0.0f, 1.0f));
-	location = glGetUniformLocation(program, "u_color2");
-	CHECKCALL(glUniform4f(location, 0.0f, 1.0f, 0.0f, 1.0f));
-	location = glGetUniformLocation(program, "u_color3");
-	CHECKCALL(glUniform4f(location, 0.0f, 0.0f, 1.0f, 1.0f));
+
+	glUseProgram(0);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
@@ -215,6 +220,12 @@ int main(void)
 		/* Render here */
 		glClearColor(0.5f, 0.5f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+		
+		glUseProgram(program);
+		glUniform4f(0, 1.0f, 0.0f, 0.0f, 1.0f);
+		glBindVertexArray(vertexarray);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
+		
 		
 		//draw
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
